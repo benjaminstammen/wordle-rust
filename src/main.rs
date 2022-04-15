@@ -1,5 +1,5 @@
-use dialoguer::{Input, Select};
 use dialoguer::theme::ColorfulTheme;
+use dialoguer::Input;
 
 use crate::game::GameState;
 
@@ -62,10 +62,10 @@ fn main() {
     match game_status {
         GameState::Lost => {
             println!("You lost! Word was {}.", grid.word)
-        },
+        }
         GameState::Won => {
             println!("You won! Good job!")
-        },
-        _ => panic!("Exited game loop in non-final state")
+        }
+        _ => panic!("Exited game loop in non-final state"),
     }
 }

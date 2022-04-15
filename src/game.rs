@@ -1,8 +1,8 @@
+use dialoguer::console;
+use dialoguer::console::StyledObject;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 use std::hash::Hash;
-use dialoguer::console;
-use dialoguer::console::StyledObject;
 use tabled::{builder::Builder, Style};
 
 pub struct Counter<T: Clone + Eq + Hash> {
@@ -18,7 +18,8 @@ impl<T: Clone + Display + Eq + Hash> Counter<T> {
 
     pub fn add_vec<I>(&mut self, collection: I)
     where
-        I: Iterator<Item = T> {
+        I: Iterator<Item = T>,
+    {
         for object in collection {
             let count = self.counts.entry(object.clone()).or_insert(0);
             *count += 1;
@@ -26,7 +27,7 @@ impl<T: Clone + Display + Eq + Hash> Counter<T> {
     }
 
     pub fn clone_counts(&self) -> HashMap<T, i32> {
-        return self.counts.clone();
+        self.counts.clone()
     }
 }
 
@@ -48,7 +49,6 @@ pub struct Grid {
 }
 
 impl Grid {
-
     pub fn new(word: String) -> Grid {
         let mut grid = Grid {
             word,
@@ -61,7 +61,7 @@ impl Grid {
             styled_guesses: Vec::new(),
         };
         grid.char_counts.add_vec(grid.word.chars());
-        return grid
+        grid
     }
 
     // TODO: push styled chars onto array to save processing?
@@ -70,16 +70,15 @@ impl Grid {
         self.compute_renderables(guess);
 
         if self.word == guess {
-            return GameState::Won
+            return GameState::Won;
         } else if self.guesses.len() >= self.max_guesses as usize {
-            return GameState::Lost
+            return GameState::Lost;
         }
-        return GameState::InProgress
+        GameState::InProgress
     }
 
     pub fn print(&self) {
-        let mut table_builder = Builder::default()
-            .set_header(1..=self.word.chars().count());
+        let mut table_builder = Builder::default().set_header(1..=self.word.chars().count());
         for row in self.styled_guesses.iter() {
             table_builder = table_builder.add_row(row)
         }
@@ -133,7 +132,7 @@ impl Grid {
         //
         // Not in default wordle, added to indicate a letter that must have more
         // instances in the word in order to complete the puzzle
-        for (i , char) in guess.chars().enumerate() {
+        for (i, char) in guess.chars().enumerate() {
             if self.word.chars().nth(i).unwrap() == char {
                 let count = char_counts.get_mut(&char).unwrap();
                 if *count > 0 {
@@ -143,7 +142,12 @@ impl Grid {
         }
         // Set differences
         self.close_chars = &self.close_chars.clone() - &self.known_chars.clone();
-        self.unused_chars = &self.unused_chars.clone() - (&self.known_chars.union(&self.close_chars.clone()).copied().collect());
+        self.unused_chars = &self.unused_chars.clone()
+            - (&self
+                .known_chars
+                .union(&self.close_chars.clone())
+                .copied()
+                .collect());
         self.styled_guesses.push(row_vec);
     }
 }
